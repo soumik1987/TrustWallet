@@ -31,9 +31,10 @@ func(ms *memoryStorage) SaveCurrentBlock(blockNumber int64){
 	ms.lastParsedBlock = blockNumber
 }
 
-func(ms *memoryStorage) SaveTransactionList( txn Transaction){
-	ms.mu.Lock()
-	defer ms.mu.Unlock()
+func(ms *memoryStorage) SaveTransactionList(txn Transaction){
+	// ms.mu.Lock()
+	// defer ms.mu.Unlock()
+
 	ms.txnRepo = append(ms.txnRepo, txn)
 }
 
@@ -60,7 +61,7 @@ func(ms *memoryStorage) Subscribe(address string) bool{
 }
 
 func(ms *memoryStorage) IsSubscribed(address string) bool{
-	v, ok := ms.subscribedAddress[strings.ToLower(address)]
+	_, ok := ms.subscribedAddress[strings.ToLower(address)]
 	return ok
 }
 

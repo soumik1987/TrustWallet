@@ -14,19 +14,32 @@ type Subscriber interface {
 	// Subscribe(address string) bool
 	FetchBlockData(blockNumber *big.Int)
 	GetLatestBlockNumber() (uint64, error)
+	SaveTranactions()
 }
 
 type EthSubscriber struct{
 	storage Storage
 	url string
+	ch chan Transaction
 }
 
-func NewEthSubscriber(storage Storage, url string) *EthSubscriber{
+func NewEthSubscriber(storage Storage, url string, ch chan Transaction) *EthSubscriber{
 	return &EthSubscriber{
 		storage: storage,
 		url: url,
+		ch: ch,
 	}
 }
+
+func(es *EthSubscriber) SaveTransactions(){
+	for {
+		select{
+		case txn:= <- es.ch:
+			es.storage.SaveTransactionList(txn)
+		}
+	}
+}
+
 
 func(es *EthSubscriber) FetchBlockData(blockNumber *big.Int){
 	blockNumberHex := fmt.Sprintf("0x%x", blockNumber)
@@ -125,13 +138,12 @@ func(es *EthSubscriber) GetLatestBlockNumber() (uint64, error) {
 
 func(es *EthSubscriber) processTransaction(transaction Transaction) {
 	// handle txn without To field
-	fmt.Printf("Hash: %s\n", transaction.Hash)
-	fmt.Printf("From: %s\n", transaction.From)
-	fmt.Printf("To: %s\n", transaction.To)
-	if es.storage.IsSubscribed(transaction.From) || ( transaction.To!="" && es.storage.IsSubscribed(transaction.To) ){
-		// fmt.Printf("Transaction Hash: %s\n", transaction.Hash )
-		fmt.Printf("From: %v\n", transaction)
-		es.storage.SaveTransactionList(transaction)
+	if ( transaction.From!="" && es.storage.IsSubscribed(transaction.From) ) || ( transaction.To!="" && es.storage.IsSubscribed(transaction.To) ){
+		fmt.Printf("Hash: %s\n", transaction.Hash)
+
+		es.ch <- transaction
+
+		// es.storage.SaveTransactionList(transaction)
 	}
 
 	fmt.Println("-------------------------")

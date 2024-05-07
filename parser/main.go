@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	ch := make(chan Transaction)
 	repo := NewMemoryStorage()
 
 	err := godotenv.Load()
@@ -21,7 +22,7 @@ func main() {
 
 	// These 2 will be differnet microservices
 	ethParser := NewEthereumParser(repo)
-	ethSubscriber := NewEthSubscriber(repo, url)
+	ethSubscriber := NewEthSubscriber(repo, url, ch)
 
 	server := NewServer(ethParser)
 	go server.Start()
@@ -36,6 +37,8 @@ func main() {
 	// Poll for new blocks every 5 seconds
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
+
+	go ethSubscriber.SaveTransactions()
 
 	for {
 		select {
