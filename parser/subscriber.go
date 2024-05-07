@@ -31,6 +31,7 @@ func NewEthSubscriber(storage Storage, url string, ch chan Transaction) *EthSubs
 	}
 }
 
+// save and notify users in real time
 func(es *EthSubscriber) SaveTransactions(){
 	for {
 		select{
