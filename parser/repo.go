@@ -1,8 +1,8 @@
 package main
 
 import (
-	// "fmt"
 	"sync"
+	"strings"
 )
 
 type Storage interface{
@@ -20,7 +20,7 @@ type memoryStorage struct{
 
 	lastParsedBlock int64
 	subscribedAddress map[string]bool
-	dataStorage []Transaction
+	txnRepo []Transaction
 }
 
 func(ms *memoryStorage) GetCurrentBlock() int64{
@@ -34,14 +34,15 @@ func(ms *memoryStorage) SaveCurrentBlock(blockNumber int64){
 func(ms *memoryStorage) SaveTransactionList( txn Transaction){
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
-	ms.dataStorage = append(ms.dataStorage, txn)
+	ms.txnRepo = append(ms.txnRepo, txn)
 }
 
 func(ms *memoryStorage) FetchTransactionList(address string) []Transaction{
 	// loop
+	addr := strings.ToLower(address)
 	var t = []Transaction{}
-	for _, v := range ms.dataStorage {
-		if v.From==address || v.To==address{
+	for _, v := range ms.txnRepo {
+		if v.From==addr || v.To==addr{
 			t= append(t,v)
 		}
 	}
@@ -50,15 +51,16 @@ func(ms *memoryStorage) FetchTransactionList(address string) []Transaction{
 }
 
 func(ms *memoryStorage) Subscribe(address string) bool{
-	if _,ok := ms.subscribedAddress[address]; ok{
+	adrs := strings.ToLower(address)
+	if _,ok := ms.subscribedAddress[adrs]; ok{
 		return false
 	}
-	ms.subscribedAddress[address] = true
+	ms.subscribedAddress[adrs] = true
 	return true
 }
 
 func(ms *memoryStorage) IsSubscribed(address string) bool{
-	_,ok := ms.subscribedAddress[address]
+	v, ok := ms.subscribedAddress[strings.ToLower(address)]
 	return ok
 }
 

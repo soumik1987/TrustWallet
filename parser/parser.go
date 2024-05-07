@@ -22,23 +22,23 @@ type Parser interface {
 }
 
 type EthereumParser struct{
-	storage Storage
+	repo Storage
 }
 
 func(ep *EthereumParser)  GetCurrentBlock() int{
-	return int(ep.storage.GetCurrentBlock())
+	return int(ep.repo.GetCurrentBlock())
 }
 
 func(ep *EthereumParser)  Subscribe(address string) bool{
-	return ep.storage.Subscribe(address)
+	return ep.repo.Subscribe(address)
 }
 
 func(ep *EthereumParser)  GetTransactions(address string) []Transaction{
-	return ep.storage.FetchTransactionList(address)
+	return ep.repo.FetchTransactionList(address)
 }
 
-func NewEthereumParser(storage Storage) *EthereumParser{
+func NewEthereumParser(repo Storage) *EthereumParser{
 	return &EthereumParser{
-		storage: storage,
+		repo: repo,
 	}
 }

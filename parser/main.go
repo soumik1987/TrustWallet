@@ -1,21 +1,30 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/big"
 	"time"
+	"os"
+
+	// "github.com/labstack/echo/v4"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	storage := NewMemoryStorage()
-	url := "https://cloudflare-eth.com"
+	repo := NewMemoryStorage()
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	url := os.Getenv("url")
 
 	// These 2 will be differnet microservices
-	ethParser := NewEthereumParser(storage)
-	ethSubscriber := NewEthSubscriber(storage, url)
+	ethParser := NewEthereumParser(repo)
+	ethSubscriber := NewEthSubscriber(repo, url)
 
-	fmt.Println(ethParser)
+	server := NewServer(ethParser)
+	go server.Start()
 
 	// There will be a persistant value for processedBlock to start
 	block, err := ethSubscriber.GetLatestBlockNumber()
@@ -44,4 +53,5 @@ func main() {
 			processedBlock = int64(latestBlockNumber)+1
 		}
 	}
+
 }

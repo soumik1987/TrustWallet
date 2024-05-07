@@ -58,7 +58,9 @@ func(es *EthSubscriber) FetchBlockData(blockNumber *big.Int){
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
+		fmt.Println("Error Decoding: ", resp.Body, err)
+		return
 	}
 
 	jsonData, err := json.Marshal(result)
@@ -122,12 +124,13 @@ func(es *EthSubscriber) GetLatestBlockNumber() (uint64, error) {
 
 
 func(es *EthSubscriber) processTransaction(transaction Transaction) {
-
-	if es.storage.IsSubscribed(transaction.From) || es.storage.IsSubscribed(transaction.To) {
+	// handle txn without To field
+	fmt.Printf("Hash: %s\n", transaction.Hash)
+	fmt.Printf("From: %s\n", transaction.From)
+	fmt.Printf("To: %s\n", transaction.To)
+	if es.storage.IsSubscribed(transaction.From) || ( transaction.To!="" && es.storage.IsSubscribed(transaction.To) ){
 		// fmt.Printf("Transaction Hash: %s\n", transaction.Hash )
-		fmt.Printf("From: %s\n", transaction.From)
-		fmt.Printf("To: %s\n", transaction.To)
-		fmt.Printf("Value: %s\n", transaction.Value)
+		fmt.Printf("From: %v\n", transaction)
 		es.storage.SaveTransactionList(transaction)
 	}
 
