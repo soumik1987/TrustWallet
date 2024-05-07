@@ -3,12 +3,13 @@ package main
 import (
 	"sync"
 	"strings"
+	"errors"
 )
 
 type Storage interface{
 	Subscribe(address string) bool
 	SaveTransactionList(txn Transaction)
-	FetchTransactionList(address string) []Transaction
+	FetchTransactionList(address string) ([]Transaction, error)
 	GetCurrentBlock() int64
 	SaveCurrentBlock(blockNumber int64)
 	IsSubscribed(address string) bool
@@ -38,9 +39,13 @@ func(ms *memoryStorage) SaveTransactionList(txn Transaction){
 	ms.txnRepo = append(ms.txnRepo, txn)
 }
 
-func(ms *memoryStorage) FetchTransactionList(address string) []Transaction{
+func(ms *memoryStorage) FetchTransactionList(address string) ([]Transaction, error){
 	// loop
 	addr := strings.ToLower(address)
+	if !ms.IsSubscribed(addr){
+		return nil, errors.New("Address not subscribed")
+	}
+
 	var t = []Transaction{}
 	for _, v := range ms.txnRepo {
 		if v.From==addr || v.To==addr{
@@ -48,10 +53,11 @@ func(ms *memoryStorage) FetchTransactionList(address string) []Transaction{
 		}
 	}
 
-	return t
+	return t, nil
 }
 
 func(ms *memoryStorage) Subscribe(address string) bool{
+	// need to check checksum address
 	adrs := strings.ToLower(address)
 	if _,ok := ms.subscribedAddress[adrs]; ok{
 		return false

@@ -1,9 +1,7 @@
 package main
 
 import(
-	// "fmt"
 	"net/http"
-	// "encoding/json"
 
 	"github.com/labstack/echo/v4"
 )
@@ -24,7 +22,6 @@ func(p *ParserHandler) HealthCheck(c echo.Context) error {
 
 // localhost:8080/get_current_block
 func(p *ParserHandler) GetCurrentBlock(c echo.Context) error {
-	// return c.JSON(http.StatusInternalServerError, err.Error())
 	res := p.ethParser.GetCurrentBlock()
 
   	return c.JSON(http.StatusOK, res)
@@ -41,6 +38,9 @@ func(p *ParserHandler) Subscribe(c echo.Context) error {
 // localhost:8080/get_transactions?address=0xaA247c0D81B83812e1ABf8bAB078E4540D87e3fB
 func(p *ParserHandler) GetTransactions(c echo.Context) error {
 	address := c.QueryParam("address")
-	res := p.ethParser.GetTransactions(address)
+	res, err := p.ethParser.GetTransactions(address)
+	if err != nil{
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
 	return c.JSON(http.StatusOK, res)
 }

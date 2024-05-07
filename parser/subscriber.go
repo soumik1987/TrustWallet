@@ -138,13 +138,11 @@ func(es *EthSubscriber) GetLatestBlockNumber() (uint64, error) {
 
 
 func(es *EthSubscriber) processTransaction(transaction Transaction) {
-	// handle txn without To field
+	// handle txn without To/Form field
 	if ( transaction.From!="" && es.storage.IsSubscribed(transaction.From) ) || ( transaction.To!="" && es.storage.IsSubscribed(transaction.To) ){
 		fmt.Printf("Hash: %s\n", transaction.Hash)
 
 		es.ch <- transaction
-
-		// es.storage.SaveTransactionList(transaction)
 	}
 
 	fmt.Println("-------------------------")

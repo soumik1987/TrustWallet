@@ -18,7 +18,7 @@ type Parser interface {
 	// list of inbound or outbound transactions for an address
 	// what is the address does not exist or subscribed to
 	// address might not be valid
-	GetTransactions(address string) []Transaction
+	GetTransactions(address string) ([]Transaction, error)
 }
 
 type EthereumParser struct{
@@ -33,7 +33,7 @@ func(ep *EthereumParser)  Subscribe(address string) bool{
 	return ep.repo.Subscribe(address)
 }
 
-func(ep *EthereumParser)  GetTransactions(address string) []Transaction{
+func(ep *EthereumParser)  GetTransactions(address string) ([]Transaction, error){
 	return ep.repo.FetchTransactionList(address)
 }
 
