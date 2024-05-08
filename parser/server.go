@@ -24,9 +24,9 @@ func(s *server) Start(){
 	parserHandler := NewParserHandler(s.ethParser)
 
 	s.e.GET("/health_check", parserHandler.HealthCheck)
-	s.e.GET("/get_current_block", parserHandler.GetCurrentBlock)
+	s.e.GET("/current_block", parserHandler.GetCurrentBlock)
 	s.e.POST("/subscribe", parserHandler.Subscribe)
-	s.e.GET("/get_transactions", parserHandler.GetTransactions)
+	s.e.GET("/transactions", parserHandler.GetTransactions)
 
   	s.e.Logger.Fatal(s.e.Start(":8080"))
 }

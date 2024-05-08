@@ -20,7 +20,7 @@ func(p *ParserHandler) HealthCheck(c echo.Context) error {
 	return c.String(http.StatusOK, "Alive!")
 }
 
-// localhost:8080/get_current_block
+// localhost:8080/current_block
 func(p *ParserHandler) GetCurrentBlock(c echo.Context) error {
 	res := p.ethParser.GetCurrentBlock()
 
@@ -35,7 +35,7 @@ func(p *ParserHandler) Subscribe(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-// localhost:8080/get_transactions?address=0xaA247c0D81B83812e1ABf8bAB078E4540D87e3fB
+// localhost:8080/transactions?address=0xaA247c0D81B83812e1ABf8bAB078E4540D87e3fB
 func(p *ParserHandler) GetTransactions(c echo.Context) error {
 	address := c.QueryParam("address")
 	res, err := p.ethParser.GetTransactions(address)

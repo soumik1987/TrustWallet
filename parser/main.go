@@ -35,7 +35,7 @@ func main() {
 	processedBlock:=int64(block)
 
 	// Poll for new blocks every 5 seconds
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
 	go ethSubscriber.SaveTransactions()
